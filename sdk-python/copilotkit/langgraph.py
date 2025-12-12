@@ -10,7 +10,6 @@ from typing import List, Optional, Any, Union, Dict, Callable, cast
 from typing_extensions import TypedDict
 from langgraph.graph import MessagesState
 
-
 from langchain_core.messages import (
     HumanMessage,
     SystemMessage,
@@ -27,15 +26,18 @@ from .logging import get_logger
 
 logger = get_logger(__name__)
 
+
 class CopilotContextItem(TypedDict):
     """Copilot context item"""
     description: str
     value: Any
 
+
 class CopilotKitProperties(TypedDict):
     """CopilotKit state"""
     actions: List[Any]
     context: List[CopilotContextItem]
+
 
 class CopilotKitState(MessagesState):
     """CopilotKit state"""
@@ -44,10 +46,11 @@ class CopilotKitState(MessagesState):
 
 def copilotkit_messages_to_langchain(
         use_function_call: bool = False
-    ) -> Callable[[List[Message]], List[BaseMessage]]:
+) -> Callable[[List[Message]], List[BaseMessage]]:
     """
     Convert CopilotKit messages to LangChain messages
     """
+
     def _copilotkit_messages_to_langchain(messages: List[Message]) -> List[BaseMessage]:
         result = []
         processed_action_executions = set()
@@ -65,11 +68,11 @@ def copilotkit_messages_to_langchain(
                         id=message["id"],
                         content="",
                         additional_kwargs={
-                            'function_call':{
+                            'function_call': {
                                 'name': message["name"],
                                 'arguments': json.dumps(message["arguments"]),
                             }
-                        } 
+                        }
                     ))
                 else:
                     # convert multiple tool calls to a single message
@@ -86,7 +89,7 @@ def copilotkit_messages_to_langchain(
 
                     # Find all tool calls for this message
                     for msg in messages:
-                        if msg.get("parentMessageId", None) == message_id or msg["id"] == message_id:
+                        if (msg.get("parentMessageId", None) == message_id or msg["id"] == message_id) and msg["type"] == "ActionExecutionMessage":
                             all_tool_calls.append(msg)
 
                     tool_calls = [{
@@ -118,7 +121,7 @@ def copilotkit_messages_to_langchain(
 
 def langchain_messages_to_copilotkit(
         messages: List[BaseMessage]
-    ) -> List[Message]:
+) -> List[Message]:
     """
     Convert LangChain messages to CopilotKit messages
     """
@@ -183,7 +186,6 @@ def langchain_messages_to_copilotkit(
     # Create a dictionary to map message ids to their corresponding messages
     results_dict = {msg["actionExecutionId"]: msg for msg in result if "actionExecutionId" in msg}
 
-
     # since we are splitting multiple tool calls into multiple messages,
     # we need to reorder the corresponding result messages to be after the tool call
     reordered_result = []
@@ -205,14 +207,15 @@ def langchain_messages_to_copilotkit(
 
     return reordered_result
 
+
 def copilotkit_customize_config(
         base_config: Optional[RunnableConfig] = None,
         *,
         emit_messages: Optional[bool] = None,
         emit_tool_calls: Optional[Union[bool, str, List[str]]] = None,
         emit_intermediate_state: Optional[List[IntermediateStateConfig]] = None,
-        emit_all: Optional[bool] = None, # deprecated
-    ) -> RunnableConfig:
+        emit_all: Optional[bool] = None,  # deprecated
+) -> RunnableConfig:
     """
     Customize the LangGraph configuration for use in CopilotKit.
 
@@ -225,7 +228,7 @@ def copilotkit_customize_config(
     ### Examples
 
     Disable emitting messages and tool calls:
-    
+
     ```python
     from copilotkit.langgraph import copilotkit_customize_config
 
@@ -338,6 +341,7 @@ async def copilotkit_exit(config: RunnableConfig):
 
     return True
 
+
 async def copilotkit_emit_state(config: RunnableConfig, state: Any):
     """
     Emits intermediate state to CopilotKit. Useful if you have a longer running node and you want to
@@ -374,6 +378,7 @@ async def copilotkit_emit_state(config: RunnableConfig, state: Any):
     await asyncio.sleep(0.02)
 
     return True
+
 
 async def copilotkit_emit_message(config: RunnableConfig, message: str):
     """
@@ -458,6 +463,7 @@ async def copilotkit_emit_tool_call(config: RunnableConfig, *, name: str, args: 
 
     return True
 
+
 def copilotkit_interrupt(
         message: Optional[str] = None,
         action: Optional[str] = None,
@@ -476,13 +482,13 @@ def copilotkit_interrupt(
     else:
         tool_id = str(uuid.uuid4())
         interrupt_message = AIMessage(
-                content="",
-                tool_calls=[{
-                    "id": tool_id,
-                    "name": action,
-                    "args": args or {}
-                }]
-            )
+            content="",
+            tool_calls=[{
+                "id": tool_id,
+                "name": action,
+                "args": args or {}
+            }]
+        )
         interrupt_values = {
             "action": action,
             "args": args or {}
