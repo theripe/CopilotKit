@@ -50,6 +50,7 @@ const ToolCallRenderer = React.memo(
           args={args}
           status={ToolCallStatus.Complete}
           result={toolMessage.content}
+          toolCallId={toolCall.id}
         />
       );
     } else if (isExecuting) {
@@ -59,6 +60,7 @@ const ToolCallRenderer = React.memo(
           args={args}
           status={ToolCallStatus.Executing}
           result={undefined}
+          toolCallId={toolCall.id}
         />
       );
     } else {
@@ -68,6 +70,7 @@ const ToolCallRenderer = React.memo(
           args={args}
           status={ToolCallStatus.InProgress}
           result={undefined}
+          toolCallId={toolCall.id}
         />
       );
     }

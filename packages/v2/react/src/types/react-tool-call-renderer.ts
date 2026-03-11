@@ -15,18 +15,21 @@ export interface ReactToolCallRenderer<T = unknown> {
         args: Partial<T>;
         status: ToolCallStatus.InProgress;
         result: undefined;
+        toolCallId: string;
       }
     | {
         name: string;
         args: T;
         status: ToolCallStatus.Executing;
         result: undefined;
+        toolCallId: string;
       }
     | {
         name: string;
         args: T;
         status: ToolCallStatus.Complete;
         result: string;
+        toolCallId: string;
       }
   >;
 }

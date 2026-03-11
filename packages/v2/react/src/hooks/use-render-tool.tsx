@@ -11,6 +11,7 @@ export interface RenderToolInProgressProps<S extends z.ZodTypeAny> {
   parameters: Partial<z.infer<S>>;
   status: "inProgress";
   result: undefined;
+  toolCallId: string;
 }
 
 export interface RenderToolExecutingProps<S extends z.ZodTypeAny> {
@@ -18,6 +19,7 @@ export interface RenderToolExecutingProps<S extends z.ZodTypeAny> {
   parameters: z.infer<S>;
   status: "executing";
   result: undefined;
+  toolCallId: string;
 }
 
 export interface RenderToolCompleteProps<S extends z.ZodTypeAny> {
@@ -25,6 +27,7 @@ export interface RenderToolCompleteProps<S extends z.ZodTypeAny> {
   parameters: z.infer<S>;
   status: "complete";
   result: string;
+  toolCallId: string;
 }
 
 export type RenderToolProps<S extends z.ZodTypeAny> =

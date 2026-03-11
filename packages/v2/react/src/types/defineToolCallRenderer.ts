@@ -16,18 +16,21 @@ type RenderProps<T> =
       args: Partial<T>;
       status: ToolCallStatus.InProgress;
       result: undefined;
+      toolCallId: string;
     }
   | {
       name: string;
       args: T;
       status: ToolCallStatus.Executing;
       result: undefined;
+      toolCallId: string;
     }
   | {
       name: string;
       args: T;
       status: ToolCallStatus.Complete;
       result: string;
+      toolCallId: string;
     };
 
 // Overload for wildcard tools without args
